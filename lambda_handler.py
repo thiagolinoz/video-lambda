@@ -27,7 +27,7 @@ def lambda_handler(event, context):
         print ('{"statusCode": 400, "body": "Email e senha obrigatórios"}')
         effect = "Deny"
 
-    response = table.get_item(Key={"email": email})
+    response = table.get_item(Key={"nmEmail": email})
 
     if "Item" not in response:
         print('{"statusCode": 404, "body": "Usuário não encontrado"}')
