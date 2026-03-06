@@ -29,17 +29,16 @@ def lambda_handler(event, context):
 
     response = table.get_item(Key={"nmEmail": email})
 
-    if "Item" not in response:
-        print('{"statusCode": 404, "body": "Usuário não encontrado"}')
-        effect = "Deny"
-
-    senha_banco = response["Item"]["cdPassword"]
-
-    if senha_banco == senha:
-        print('{"statusCode": 200, "body": "Login autorizado"}')
-        effect = "Allow"
+    if "Item" in response:
+        senha_banco = response["Item"]["cdPassword"]
+        if senha_banco == senha:
+            print('{"statusCode": 200, "body": "Login autorizado"}')
+            effect = "Allow"
+        else:
+            print('{"statusCode": 401, "body": "Senha inválida"}')
+            effect = "Deny"
     else:
-        print('{"statusCode": 401, "body": "Senha inválida"}')
+        print('{"statusCode": 404, "body": "Usuário não encontrado"}')
         effect = "Deny"
 
     return {
