@@ -23,24 +23,25 @@ def lambda_handler(event, context):
 
 
 
-    if not email or not senha:
+    if email or senha:
+        response = table.get_item(Key={"nmEmail": email})
+
+        if "Item" in response:
+            senha_banco = response["Item"]["cdPassword"]
+            if senha_banco == senha:
+                print('{"statusCode": 200, "body": "Login autorizado"}')
+                effect = "Allow"
+            else:
+                print('{"statusCode": 401, "body": "Senha inválida"}')
+                effect = "Deny"
+        else:
+            print('{"statusCode": 404, "body": "Usuário não encontrado"}')
+            effect = "Deny"
+
+    else:
         print ('{"statusCode": 400, "body": "Email e senha obrigatórios"}')
         effect = "Deny"
-
-    response = table.get_item(Key={"nmEmail": email})
-
-    if "Item" in response:
-        senha_banco = response["Item"]["cdPassword"]
-        if senha_banco == senha:
-            print('{"statusCode": 200, "body": "Login autorizado"}')
-            effect = "Allow"
-        else:
-            print('{"statusCode": 401, "body": "Senha inválida"}')
-            effect = "Deny"
-    else:
-        print('{"statusCode": 404, "body": "Usuário não encontrado"}')
-        effect = "Deny"
-
+    
     return {
         "principalId": "test-user",
         "policyDocument": {
