@@ -14,14 +14,15 @@ def lambda_handler(event, context):
     auth_header = headers.get("authorization")
     print ("Authorization header:", auth_header)
     if auth_header and auth_header.startswith("Basic "):
+        try:
+            encoded_credentials = auth_header.split(" ")[1]
 
-        encoded_credentials = auth_header.split(" ")[1]
+            decoded = base64.b64decode(encoded_credentials).decode("utf-8")
 
-        decoded = base64.b64decode(encoded_credentials).decode("utf-8")
-
-        email, senha = decoded.split(":")
-
-
+            email, senha = decoded.split(":")
+        except:
+            print('{"statusCode": 400, "body": "Credenciais inválidas"}')
+            effect = "Deny"
 
     if email or senha:
         response = table.get_item(Key={"nmEmail": email})
